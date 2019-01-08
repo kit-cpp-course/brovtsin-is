@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Config.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Polynom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -33,11 +30,26 @@
     <ClInclude Include="NTRUEncryptUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CLConfigurationParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CryptosystemActions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CryptosystemRegistry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NTRUActions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PKCSActions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -51,6 +63,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NTRUEncryptUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CryptosystemActions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CryptosystemRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NTRUActions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PKCSActions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CLConfigurationParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

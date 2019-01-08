@@ -151,19 +151,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Config.h" />
+    <ClInclude Include="CLConfigurationParser.h" />
+    <ClInclude Include="ConfigurationParser.h" />
+    <ClInclude Include="CryptosystemActions.h" />
+    <ClInclude Include="CryptosystemRegistry.h" />
+    <ClInclude Include="NTRUActions.h" />
     <ClInclude Include="NTRUEncrypt.h" />
     <ClInclude Include="NTRUEncryptKeyParams.h" />
     <ClInclude Include="NTRUEncryptUtils.h" />
+    <ClInclude Include="PKCSActions.h" />
     <ClInclude Include="PKCSProvider.h" />
     <ClInclude Include="Polynom.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="CLConfigurationParser.cpp" />
+    <ClCompile Include="CryptosystemActions.cpp" />
+    <ClCompile Include="CryptosystemRegistry.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NTRUActions.cpp" />
     <ClCompile Include="NTRUEncrypt.cpp" />
     <ClCompile Include="NTRUEncryptKeyParams.cpp" />
     <ClCompile Include="NTRUEncryptUtils.cpp" />
+    <ClCompile Include="PKCSActions.cpp" />
     <ClCompile Include="Polynom.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

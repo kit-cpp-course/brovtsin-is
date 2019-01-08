@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 
   // Если действие не указано или не найдено
   std::string actionname;
-  ActionInfo *action;
+  ActionInfo *action = nullptr;
   bool noaction;
   if ((noaction = ConfigurationParser::GetParameter(map, "action", actionname) != PARAMETER_SET) ||
       (action = actions->FindAction(actionname)) == nullptr) {

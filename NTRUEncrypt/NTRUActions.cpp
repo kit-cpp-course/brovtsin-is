@@ -14,7 +14,7 @@ NTRUActions::NTRUActions() : PKCSActions("ntru") {
 bool NTRUActions::GenerateKeysAction(const paramsmap &params) {
   bool nostandard;
   std::string standardName;
-  NTRU::KeyParams *standard;
+  NTRU::KeyParams *standard = nullptr;
   if ((nostandard = ConfigurationParser::GetParameter(params, "standard", standardName) != PARAMETER_SET) ||
       (standard = NTRU::KeyParams::GetParamsByName(standardName)) == nullptr) {
     if (nostandard) {
