@@ -10,7 +10,7 @@ NTRUEncrypt::~NTRUEncrypt() {
   delete m_fp;
 }
 
-Polynom *NTRUEncrypt::GeneratePrivateKey(KeyParams *params, Polynom *&f_pptr, Polynom *&f_qptr) {
+bool NTRUEncrypt::GeneratePrivateKey(Polynom *&f_qptr) {
   Polynom *f = nullptr;
   Polynom *f_p = nullptr;
   Polynom *f_q = nullptr;
@@ -20,71 +20,64 @@ Polynom *NTRUEncrypt::GeneratePrivateKey(KeyParams *params, Polynom *&f_pptr, Po
     delete f_p;
     delete f_q;
     // f = 1 + p*F
-    f = NTRUEncryptUtils::RandomTernaryPolynom(params->N, params->df, params->df);
-    (*f) *= params->p;
+    f = NTRUEncryptUtils::RandomTernaryPolynom(m_params->N, m_params->df, m_params->df);
+    (*f) *= m_params->p;
     (*f)[0]++;
 
     // Ищем f^-1 mod p и f^-1 mod q (для доказательства обратимости)
-    f_p = f->InverseModuloPrime(params->p);
-    f_q = f->InverseModuloPrimePower(2, params->q);
+    f_p = f->InverseModuloPrime(m_params->p);
+    f_q = f->InverseModuloPrimePower(2, m_params->q);
   } while (f_p == nullptr || f_q == nullptr);
   // Сохраняем f_p и f_q
-  f_pptr = f_p;
+  m_private = f;
+  m_fp = f_p;
   f_qptr = f_q;
-  return f;
+  return true;
 }
 
-Polynom *NTRUEncrypt::GeneratePublicKey(KeyParams *params, Polynom *private_key, Polynom *f_q) {
+bool NTRUEncrypt::GeneratePublicKey(Polynom *f_q) {
   if (f_q == nullptr) {
-    f_q = private_key->InverseModuloPrimePower(2, params->q);
+    f_q = m_private->InverseModuloPrimePower(2, m_params->q);
   }
 
-  if (f_q == nullptr) return nullptr;
+  if (f_q == nullptr) return false;
   Polynom *g = nullptr;
   Polynom *ginverted = nullptr;
   do {
     delete g;
-    g = NTRUEncryptUtils::RandomTernaryPolynom(params->N, params->dg + 1, params->dg);
-    ginverted = g->InverseModuloPrimePower(2, params->q);
+    g = NTRUEncryptUtils::RandomTernaryPolynom(m_params->N, m_params->dg + 1, m_params->dg);
+    ginverted = g->InverseModuloPrimePower(2, m_params->q);
   } while (ginverted == nullptr);
   delete ginverted;
 
   Polynom h = *f_q * *g;
   delete f_q;
   delete g;
-  for (int i = 0; i < params->N; i++) {
-    h[i] = (h[i] * params->p) % params->q;
+  for (int i = 0; i < m_params->N; i++) {
+    h[i] = (h[i] * m_params->p) % m_params->q;
     if (h[i] < 0) {
-      h[i] += params->q;
+      h[i] += m_params->q;
     }
   }
-  return new Polynom(h);
+  m_public = new Polynom(h);
+  return true;
 }
 
 void NTRUEncrypt::GenerateKeypair() {
-  Polynom *new_private = nullptr;
-  Polynom *new_fp = nullptr;
   Polynom *new_fq = nullptr;
-  Polynom *new_public = nullptr;
   // Пытаемся создать пару ключей до тех пор, пока хотя бы одна не найдется
-  // (не все многочлены имеют пригодные для использования обратные многочлены)
-  do {
-    delete new_private;
-    delete new_fp;
-    delete new_fq;
-    delete new_public;
-    new_private = GeneratePrivateKey(m_params, new_private, new_fp);
-    new_public = GeneratePublicKey(m_params, new_private, new_fq);
-  } while (new_private == nullptr || new_public == nullptr);
-  // Удаляем всё, что больше не пригодится
-  delete m_public;
-  delete m_private;
-  delete m_fp;
+  // (не все многочлены имеют пригодные для использования обратные многочлены).
 
-  // Обновляем данные
-  m_private = new_private;
-  m_fp = new_fp;
-  m_public = new_public;
+  // Методы GeneratePublicKey и GeneratePrivateKey сохраняют полученные ключи в текущем объекте, т.к. старые ключи
+  // в любом случае будут перезаписаны. Поэтому же мы можем удалить старые ключи в самом начале процесса.
+  do {
+    delete m_private;
+    delete m_fp;
+    delete m_public;
+    delete new_fq;
+    GeneratePrivateKey(new_fq);
+    GeneratePublicKey(new_fq);
+  } while (m_private == nullptr || m_public == nullptr);
 }
 
 bool NTRUEncrypt::ValidateKeypair(KeypairWithParameters kwp) {
@@ -146,17 +139,25 @@ NTRUEncrypt *NTRUEncrypt::FromPrivate(KeypairWithParameters kwp) {
     return nullptr;
   }
 
-  // Если публичный ключ не задан, получаем его
-  if (kwp.public_key == nullptr) {
-    Polynom *public_key = GeneratePublicKey(kwp.params, kwp.private_key, f_q);
-    kwp.public_key = public_key;
+  // Создаем новый объект NTRUEncrypt и сохраняем в него f_p.
+  NTRUEncrypt *result = new NTRUEncrypt(kwp);
+
+  bool public_key_present = kwp.public_key != nullptr;
+  // Если публичный ключ не задан в kwp, генерируем его на основе приватного ключа.
+  // На этом этапе генерация публичного ключа гарантированно возможна, т.к. соблюдено условие "f_q существует",
+  // поэтому GeneratePublicKey перезаписывает содержимое m_public без каких-либо неприятных последствий.
+  if (!public_key_present) {
+    public_key_present = result->GeneratePublicKey(f_q);
   }
-  // f_q нужен только на стадии генерации публичного ключа
+  // f_q нужен только на стадии генерации публичного ключа, теперь его можно безопасно удалить.
   delete f_q;
 
-  // Создаем новый объект NTRUEncrypt и сохраняем в него f_p
-  NTRUEncrypt *result = new NTRUEncrypt(kwp);
-  result->m_fp = f_p;
+  // Если по каким-то причинам создать публичный ключ всё же не получилось, удаляем созданный объект и возвращаем nullptr
+  if (!public_key_present) {
+    delete result;
+    return nullptr;
+  }
+
   return result;
 }
 

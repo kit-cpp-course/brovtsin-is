@@ -48,12 +48,14 @@ class NTRUEncrypt : public PKCSProvider {
   explicit NTRUEncrypt(KeypairWithParameters kwp)
       : m_params(kwp.params), m_public(kwp.public_key), m_private(kwp.private_key) {}
 
-  /* Генерирует и возвращает многочлен приватного ключа,
-   * записывает адреса созданных многочленов f_p и f_q в f_pptr и f_qptr соответственно. */
-  Polynom *GeneratePrivateKey(KeyParams *params, Polynom *&f_pptr, Polynom *&f_qptr);
+  /* Генерирует и сохраняет в текущем объекте многочлен приватного ключа,
+   * записывает адрес созданного многочлена f_q в f_qptr для построения публичного ключа.
+   * Возвращает результат*/
+  bool GeneratePrivateKey(Polynom *&f_qptr);
 
-  /* Генерирует многочлен публичного ключа из приватного (или f_q, если указан) */
-  static Polynom *GeneratePublicKey(KeyParams *params, Polynom *private_key, Polynom *f_q);
+  /* Генерирует и сохраняет в текущем объекте многочлен публичного ключа,
+   * построенный из приватного (или f_q, если указан) */
+  bool GeneratePublicKey(Polynom *f_q);
 
   /* Сохраняет публичный ключ в stream.
    * Параметр part_of_private устанавливает значение в заголовке ключа
