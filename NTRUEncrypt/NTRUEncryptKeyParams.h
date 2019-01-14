@@ -1,5 +1,6 @@
 #ifndef NTRUENCRYPT_NTRUENCRYPTKEYPARAMS_H_
 #define NTRUENCRYPT_NTRUENCRYPTKEYPARAMS_H_
+#include <cstring>
 #include <string>
 #include <vector>
 

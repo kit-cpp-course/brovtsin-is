@@ -1,6 +1,7 @@
 #ifndef NTRUENCRYPT_POLYNOM_H_
 #define NTRUENCRYPT_POLYNOM_H_
 #include <iostream>
+#include <cstring>
 namespace bacrypt {
 /* Класс "Многочлен"
  * Имеет степень degree-1 => имеет массив коэффициентов длиной N (т.к. x^0 тоже степень, у которой может быть коэффициент)
