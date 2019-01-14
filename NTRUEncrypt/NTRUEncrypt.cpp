@@ -234,7 +234,7 @@ bool NTRUEncrypt::LoadPublicKey(istream &stream) {
 KeypairWithParameters NTRUEncrypt::LoadKeypair(istream &stream, bool force_public) {
   KeypairWithParameters result;
   PUBLIC_KEY_V1_HEADER keyheader;
-  stream.read((char *) &keyheader, sizeof(PUBLIC_KEY_V1_HEADER));
+  stream.read(reinterpret_cast<char *>(&keyheader), sizeof(PUBLIC_KEY_V1_HEADER));
   if (stream.gcount() != sizeof(PUBLIC_KEY_V1_HEADER)) return result;
 
   // Неверный формат ключа
